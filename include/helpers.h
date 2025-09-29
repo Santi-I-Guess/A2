@@ -28,11 +28,11 @@ struct game_state {
         bool heard_enemy[12];
 };
 
-bool is_valid_int(const char *buffer);
 void clear_extra_stdin();
-void get_difficulty(struct game_state *alpha);
-void peek_sign(struct game_state *alpha);
 void enemy_quip(struct game_state *alpha);
+void get_difficulty(struct game_state *alpha);
 void handle_backtrack(struct game_state *alpha);
+void peek_sign(struct game_state *alpha);
+void os_independent_sleep(unsigned int milliseconds);
 
 #endif

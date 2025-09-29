@@ -3,6 +3,16 @@
 #include <random>
 #include <unordered_map>
 
+// __linux__ is POSIX compliant
+// unsure about _WIN32 vs __CYGIN__, but i think _WIN32 is more supported
+// and, who's really using unix proper, or even FreeBSD?
+
+#if defined(_WIN32) || defined(__CYGIN__)
+#include <windows.h>
+#elif defined(__linux__) || defined(__FreeBSD__)
+#include <unistd.h>
+#endif
+
 #include "include/helpers.h"
 #include "include/samodelkin.h"
 
@@ -50,6 +60,19 @@ void clear_extra_stdin() {
         }
 }
 
+void enemy_quip(struct game_state *alpha) {
+        std::random_device rd;
+        std::mt19937 mt(rd());
+        std::uniform_int_distribution<> uid_quip(0, 11);
+        int quip_num = (int)uid_quip(mt);
+        printf("\"%s\"\n", fortune_enemy[quip_num]);
+        if (alpha->heard_enemy[quip_num]) {
+                printf("You say you've heard that before...\n");
+        } else {
+                alpha->heard_enemy[quip_num] = true;
+        }
+}
+
 void get_difficulty(struct game_state *alpha) {
         printf("Difficulties:\n\t(1) Easy\n\t(2) Medium\n\t(3) Hard\n\t(4) Insane\n");
         while (1) {
@@ -73,32 +96,7 @@ void get_difficulty(struct game_state *alpha) {
         }
 }
 
-void peek_sign(struct game_state *alpha) {
-        std::random_device rd;
-        std::mt19937 mt(rd());
-        std::uniform_int_distribution<> uid_sign(0, 11);
-        int sign_num = (int)uid_sign(mt);
-        printf("There's a sign inside the room:\n");
-        printf("\"%s\"\n", fortune_signs[sign_num]);
-        if (alpha->heard_sign[sign_num]) {
-                printf("You've read this before...\n");
-        } else {
-                alpha->heard_sign[sign_num] = true;
-        }
-}
 
-void enemy_quip(struct game_state *alpha) {
-        std::random_device rd;
-        std::mt19937 mt(rd());
-        std::uniform_int_distribution<> uid_quip(0, 11);
-        int quip_num = (int)uid_quip(mt);
-        printf("\"%s\"\n", fortune_enemy[quip_num]);
-        if (alpha->heard_enemy[quip_num]) {
-                printf("You say you've heard that before...\n");
-        } else {
-                alpha->heard_enemy[quip_num] = true;
-        }
-}
 
 void handle_backtrack(struct game_state *alpha) {
         bool seen[4] = {
@@ -161,4 +159,27 @@ void handle_backtrack(struct game_state *alpha) {
         }
 
         // if the first digit aligns with seen 0-3, go there, else back off
+}
+
+void peek_sign(struct game_state *alpha) {
+        std::random_device rd;
+        std::mt19937 mt(rd());
+        std::uniform_int_distribution<> uid_sign(0, 11);
+        int sign_num = (int)uid_sign(mt);
+        printf("There's a sign inside the room:\n");
+        printf("\"%s\"\n", fortune_signs[sign_num]);
+        if (alpha->heard_sign[sign_num]) {
+                printf("You've read this before...\n");
+        } else {
+                alpha->heard_sign[sign_num] = true;
+        }
+}
+
+void os_independent_sleep(unsigned int milliseconds) {
+#if defined(_WIN32) || defined(__CYGIN__)
+        // i think this takes ms, otherwise windows people gonna be real confused
+        sleep(milliseconds);
+#elif defined(__linux__) || defined(__FreeBSD__)
+        usleep(milliseconds);
+#endif
 }

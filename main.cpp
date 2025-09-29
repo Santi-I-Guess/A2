@@ -44,7 +44,7 @@ int main() {
                 asterisk[i] = '*';
 
         printf("\n%s\n* You are the hero, an interloper to this dungeon "
-               "sent for higher purposes *\n%s\n\n", asterisk, asterisk);
+               "sent for your own reasons *\n%s\n\n", asterisk, asterisk);
         while (alpha.curr_state == PLAYING) {
                 printf("What do you wish to do?:\n"
                        "\t[e] Explore\n"
